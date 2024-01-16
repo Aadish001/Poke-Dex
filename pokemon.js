@@ -1,4 +1,4 @@
-const MAX_POKEMON = 900;
+const MAX_POKEMON = 599;
 const listWrapper = document.querySelector(".list-wrapper");
 const searchInput = document.querySelector("#search-input");
 const numberFilter = document.querySelector("#number");
@@ -9,6 +9,7 @@ fetch(`https://pokeapi.co/api/v2/pokemon?limit=${MAX_POKEMON}`)
 .then((Response) => Response.json())
 .then((data) =>{
     allPokemon = data.results;
+    displayPokemon(allPokemon);
 });
 async function fetchPokemonDataBeforeRedirect(id){
     try{
@@ -44,6 +45,31 @@ async function fetchPokemonDataBeforeRedirect(id){
                 if (success) {
                     window.location.href = `./detail.html?id=${pokemonID}`
                 }
-            })
+            });
+            listWrapper.appendChild(listItem);
+
         });
     }
+     function handleSearch(){
+        const searchTerm = searchInput.Value.toLowerCase();
+        let filteredPokemon;
+        
+        if (numberFilter.checked){
+            filteredPokemon = allPokemon.filter((pokemon) =>{
+                const pokemonID = pokemon.url.split("/")[6];
+                return pokemonID.startsWith(searchTerm);
+            })
+        } else if (nameFilter.checked){
+            filteredPokemon = allPokemon.filter((pokemon) =>{
+                pokemon.name.toLowerCase().startsWith(searchTerm)
+            });
+        } else {
+            filteredPokemon = allPokemon
+        }
+        displayPokemon(filteredPokemon);
+
+        if (filteredPokemon.length ===0 ){
+            notFoundMessage.style.display =  "Block";
+        }
+     }
+    searchInput.addEventListener("keyup" , handleSearch)
